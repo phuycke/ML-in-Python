@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/home/daniel/.pyenv/versions/3.8.10/envs/ml-in-python/bin/python",
+    "jupyter.notebookFileRoot": "${fileDirname}",
+    "jupyter.jupyterServerType": "local"
+    
+}
