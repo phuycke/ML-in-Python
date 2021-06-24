@@ -10,7 +10,7 @@ Created on Fri Jun 18 09:29:46 2021
 
 @author: MHinojosaLee
 """
-#Load the libraries
+#%% Load the libraries
 import numpy as np
 import pandas as pd
 from matplotlib import animation as ani, pyplot as plt
@@ -29,13 +29,21 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from sklearn.impute import SimpleImputer 
 from sklearn.preprocessing import StandardScaler
-
+import getpass
+from pathlib import Path
 #%% Load data
-data_file_path = "C:/Users/mhinojosalee/Downloads/Machine learning with Python\Exam/"
-# Lets read the trining dataset
-data_train = pd.read_csv(data_file_path+'train_V2.csv')
-# Now we read the training data set
-score = pd.read_csv(data_file_path+'score.csv')
+if getpass.getuser() == 'daniel':
+      data_file_path = Path("/home/daniel/PhD/Projects/ML-in-Python")
+      # Lets read the trining dataset
+      data_train = pd.read_csv(data_file_path / 'data' / 'train_V2.csv')
+      # Now we read the training data set
+      score = pd.read_csv(data_file_path/  'data' / 'score.csv')
+else:
+      data_file_path = "C:/Users/mhinojosalee/Downloads/Machine learning with Python\Exam/"
+      # Lets read the trining dataset
+      data_train = pd.read_csv(data_file_path+'train_V2.csv')
+      # Now we read the training data set
+      score = pd.read_csv(data_file_path+'score.csv')
 
 print(data_train.shape)
 print(data_train.head())
