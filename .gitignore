@@ -1,0 +1,15 @@
+# VSCode
+.vscode/*
+.history/
+.env
+.venv
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Mac/OSX
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints

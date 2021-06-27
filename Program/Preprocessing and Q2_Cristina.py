@@ -4,7 +4,7 @@ Created on Sun Jun 27 01:35:11 2021
 
 @author: MHinojosaLee
 """
-# %%import the libraries
+# %% I mport the libraries
 import numpy as np
 import pandas as pd
 from matplotlib import animation as ani, pyplot as plt
@@ -26,18 +26,31 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from treeinterpreter import treeinterpreter as ti, utils
 import joblib
+import getpass
+from pathlib import Path
+
 # %% Load data
-data_file_path = "C:/Users/mhinojosalee/Downloads/Machine learning with Python\Exam/"
-# Lets read the training dataset
-data_train = pd.read_csv(data_file_path+'train_V2.csv')
-# Now we read the one with the potential customers
-score = pd.read_csv(data_file_path+'score.csv')
-# %%Basic things to visualize the data
+if getpass.getuser() == 'daniel':
+    project_root_path = Path("/home/daniel/PhD/PhD classes/Python Machine learning/final-project")
+    data_raw_path = project_root_path / 'data' / 'raw'
+    # Lets read the trining dataset
+    data_train = pd.read_csv(data_raw_path / 'train_V2.csv')
+    # Now we read the training data set
+    score = pd.read_csv(data_raw_path /  'score.csv')
+    # We read the dictonary
+    dict_features = pd.read_csv(data_raw_path /  'dictionary.csv', delimiter=';', header=None)
+else:
+      data_file_path = "C:/Users/mhinojosalee/Downloads/Machine learning with Python\Exam/"
+      # Lets read the trining dataset
+      data_train = pd.read_csv(data_file_path+'train_V2.csv')
+      # Now we read the training data set
+      score = pd.read_csv(data_file_path+'score.csv')
+# %% Basic things to visualize the data
 print(data_train.shape)
 print(data_train.head())
 pd.options.display.max_columns = None
 print(data_train.describe())
-# %%Visualizing the missing data, percent is the percentage of  of null data by each variable.==> things that I did not do in this way
+# %% Visualizing the missing data, percent is the percentage of  of null data by each variable.==> things that I did not do in this way
 # total = data_train.isnull().sum().sort_values(ascending=False)
 # percent = (data_train.isnull().sum()/data_train.isnull().count()).sort_values(ascending=False)
 # (data_train.isnull().sum(axis=1))[data_train.isnull().sum(axis=1) > 30]
@@ -49,7 +62,7 @@ print(data_train.describe())
 # data_train.dropna(inplace=True) 
 #we could drop all that is NaN, but we will loose observations. (4425, 43) instead of (4425, 43) 
 
-# %%Remove outcomes, because we will work on the missing data, and we can use the train and the test set for this (what is done in one, it has to be done in the other one), but we have to remove the outcome
+# %% Remove outcomes, because we will work on the missing data, and we can use the train and the test set for this (what is done in one, it has to be done in the other one), but we have to remove the outcome
 print(data_train.columns)
 data_feat = data_train.drop(['outcome_profit', 'outcome_damage_inc', 'outcome_damage_amount'], axis=1)
 print(data_feat.shape)
@@ -67,7 +80,7 @@ print(datafull['prev_stay'].value_counts())
 print(datafull['divorce'].value_counts())
 print(datafull['married_cd'].value_counts())
 
-# %%Mode imputer instead of separate categories
+# %% Mode imputer instead of separate categories
 # datafull['client_segment'] = pd.Categorical(datafull['client_segment'])
 # datafull['sect_empl'] = pd.Categorical(datafull['sect_empl'])
 # datafull['retired'] = pd.Categorical(datafull['retired'])
@@ -80,7 +93,7 @@ for cols in ['client_segment', "credit_use_ic", "gluten_ic", "lactose_ic","insur
              "company_ic", "dining_ic", "spa_ic","sport_ic","empl_ic",'sect_empl', "retired", "gold_status", "prev_stay", 'divorce', "gender"]:  
       datafull[cols] = impute_mode.fit_transform(datafull[[cols]])
       
-# %%Dummify them! (the ones that are not 0 and 1... Gender, sect_empl and client_segment)
+# %% Dummify them! (the ones that are not 0 and 1... Gender, sect_empl and client_segment)
 datafull['client_segment'] = pd.Categorical(datafull['client_segment'])
 datafull['sect_empl'] = pd.Categorical(datafull['sect_empl'])
 # The NaN categorie won't be necessary anymore, thanks to the mode imputing.
@@ -91,14 +104,14 @@ print(datafull2.shape)
 print(datafull2.head(1000))     
 
 
-# %%Dropping the original features is necessary, and I will also drop one dummy from the categorical data that I had to create "extra columns" for.
+# %% Dropping the original features is necessary, and I will also drop one dummy from the categorical data that I had to create "extra columns" for.
 print(datafull2.shape)
 datafull2.drop(['client_segment', 'sect_empl', 'gender', 'client_segment_5.0','sect_empl_6.0','gender_V'], axis=1, inplace=True)
 print(datafull2.shape)
 
 datafull2['profitpernight'] = datafull2['profit_am'] / datafull2['nights_booked']
 
-# %%Missing values per column. I decided to not drop them and use a mean imput instead. 
+# %% Missing values per column. I decided to not drop them and use a mean imput instead. 
 # During class it was mentioned that sometimes it was not worthy to use a very complex thing like sof imputing to avoid dropping these features. 
 # I am using something simple, that is a mean imputing, because these columns were the scores, and I did not want to drop them.
 # The scores are quantitative.
@@ -108,13 +121,13 @@ for cols in ['score1_pos', 'score1_neg', 'score2_pos', 'score2_neg', 'score3_pos
        'score3_neg', 'score4_pos', 'score4_neg', 'score5_pos', 'score5_neg']:  # Missing data, Scores are quantitative
       datafull2[cols] = impute_quant.fit_transform(datafull2[[cols]])
 
-# %%No we are looking for the Missing values per row
+# %% No we are looking for the Missing values per row
 print(datafull2.shape)
 datafull2.dropna(thresh = datafull2.shape[1]*0.3, axis = 0, inplace = True)
 print(datafull2.shape)
 # And here we find that there are not missing values from the rows (no missing values per row). So we go to imputting the rest of the missing values
 
-# %%Imputation using the mean for the other missing values
+# %% Imputation using the mean for the other missing values
 print(datafull2.isnull().sum().sum())
 datafull2.fillna(datafull2.mean(), inplace=True)
 print(datafull2.isnull().sum().sum())
@@ -130,11 +143,11 @@ print(data_train.shape)
 score = datafull3[5000:5500] #The score dataset will be the last 500 observations
 score.shape
 
-# %%Now it is the time to split the train and the test data sets. We decided to use 20% for testing and 80% for training
+# %% Now it is the time to split the train and the test data sets. We decided to use 20% for testing and 80% for training
 X_train, X_test, y_train, y_test = train_test_split(data_train.drop(['outcome_profit', 'outcome_damage_inc', 'outcome_damage_amount'],1),
                                                     data_train['outcome_profit'], test_size=0.2, random_state=48)
 
-# %%To answer the 2nd question, we are going to use Gradient Boost. During class it was discussed that it was a very good algorithm.
+# %% To answer the 2nd question, we are going to use Gradient Boost. During class it was discussed that it was a very good algorithm.
 # Our model will try 500 random hyperparameter combinations, each time using 5 Cross Validation folds, totalling 2500 fits
 n_estimators = [int(x) for x in np.linspace(start = 100, stop = 1000, num = 50)]
 learning_rate = [x for x in np.logspace(start = -3, stop = -0.01, num = 50)]
@@ -155,13 +168,13 @@ gbm_random = RandomizedSearchCV(estimator = gbm, param_distributions = random_gr
 gbm_random.fit(X_train, y_train)
 gbm_random.best_params_
 
-# %%It took around 30 to 40 minutes to run the model. So we will pickle it to not lose it.
+# %% It took around 30 to 40 minutes to run the model. So we will pickle it to not lose it.
 joblib.dump(gbm_random, 'random_search_gbm.pkl')
 
-# %%Output overview of the random search, if using spyder, this can be done in the console.
+# %% Output overview of the random search, if using spyder, this can be done in the console.
 pd.DataFrame(gbm_random.cv_results_).head()
 
-# %%now We will inspect the best hyperparameter combination. This boasts an average test score of 0.789
+# %% now We will inspect the best hyperparameter combination. This boasts an average test score of 0.789
 pd.DataFrame(gbm_random.cv_results_).loc[pd.DataFrame(gbm_random.cv_results_)['mean_test_score'].idxmax()]
 
 # %% Now, we will fit the model for profit as asked in question 2. For this, we are using the best hyperparameters.
@@ -198,7 +211,7 @@ ax.set_title('Variable Importance')
 plt.show()
 # This graphic is unorganized. All the variables are shown in the y axis, it is difficult to read them. So Next, I will organize it.
 
-# %%Last plot is not ordered,so the next part is to order it. 
+# %% Last plot is not ordered,so the next part is to order it. 
 importances2 = importances.copy()
 importances2 = importances2.head(20)
 import matplotlib.pyplot as plt
@@ -217,7 +230,7 @@ ax.set_title('Variable Importance')
 plt.show()
 # And now we have a nice plot
 
-# %%Permutation importance: As part of the whitening try:
+# %% Permutation importance: As part of the whitening try:
 imp = permutation_importance(gbm_profit, X_train, y_train,n_repeats=10,
                                 random_state=42, n_jobs=2)
 
