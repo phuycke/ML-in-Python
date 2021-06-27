@@ -1,37 +1,3 @@
-## Reproducible pipeline with conda
-
-To install have the same packages between different computers:
-
-Configure conda distribution to use `conda-forge` channel:
-- on Linux or Mac:
-```
-export PATH="/home/user/miniconda3/bin:$PATH"
-```
-
-
-
-```
-conda --version
-conda update conda
-conda config --add channels conda-forge
-conda config --set channel\_priority strict
-```
-
-Create virtual environment from yaml file
-```
-conda env create -n "pyml" python=3.8.10 -f environment.yml
-```
-
-Delete this environment
-```
-conda remove --name pyml --all
-```
-
-Use conda kernels systemwide:
-- Install to base
-```
-conda install nb_conda_kernels
-```
 
 ## reproducible pipeline with pyenv
 - install pyenv
@@ -98,5 +64,11 @@ pyenv activate ml-in-python
 
 # Turn notebook.ipynb into a paired ipynb/py notebook
 ```
-jupytext --set-formats ipynb,py LoadData.ipynb
+jupytext --set-formats ipynb,py Preprocessing.ipynb
+```
+
+## Turn py file into notebook
+
+```
+jupytext --to notebook notebook.py              # convert notebook.py to an .ipynb file with no outputs
 ```
